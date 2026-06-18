@@ -366,6 +366,5 @@ pub fn run_cargo_vendor_home_registry(
     res.inspect(|val| {
         trace!(?val);
         info!("📦 Cargo Vendor Home Registry finished.");
-        info!("🧹 Cleaning up temporary directory...");
     })
 }

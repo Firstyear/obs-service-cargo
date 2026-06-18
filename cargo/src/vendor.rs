@@ -86,12 +86,19 @@ pub fn run_cargo_vendor(
             } else {
                 utils::copy_dir_all(path_to_vendor_dir, target_archive_path_for_vendor_dir)?;
             }
+
             // NOTE maybe in the future, we might need to respect import
             // an existing `cargo.toml` but I doubt that's necessary?
+
             let path_to_dot_cargo_cargo_config =
                 &target_archive_path_for_dot_cargo.join("config.toml");
+
             let mut cargo_config_file = fs::File::create(path_to_dot_cargo_cargo_config)?;
+
+            cargo_config_file.write_all(b"# BEGIN VENDOR OPTIONS\n")?;
             cargo_config_file.write_all(cargo_config_output.as_bytes())?;
+            cargo_config_file.write_all(b"\n# END VENDOR OPTIONS\n")?;
+
             debug!(?cargo_config_file);
         }
         let outfile = match &vendor_opts.tag {
@@ -129,6 +136,5 @@ pub fn run_cargo_vendor(
     res.inspect(|val| {
         trace!(?val);
         info!("📦 Cargo Vendor finished.");
-        info!("🧹 Cleaning up temporary directory...");
     })
 }

@@ -59,23 +59,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("🎢 Starting OBS Service Cargo Vendor.");
     debug!(?args);
 
-    warn!("⚠️  Cargo Vendor has been rewritten in rust!");
-    eprintln!(
-        r#"
-This rewrite introduces some small changes to how vendoring functions for your package.
-
-* cargo_config is no longer created - it's part of the vendor.tar now
-    * You can safely remove lines related to cargo_config from your spec file
-
-* multiple cargotoml files can be specified and share a single vendor.tar
-    * If multiple cargo.toml files are present update does not work. This is a known
-      limitation of the process
-
-* cargo_audit is now part of cargo_vendor, meaning you don't have to configure it separately
-
-"#
-    );
-
     Ok(args.run_vendor().map_err(|err| {
         error!("{}", err);
         err

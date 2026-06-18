@@ -144,6 +144,13 @@ pub struct Opts {
     pub manifest_path: Vec<PathBuf>,
     #[arg(long, default_value_t = true, action = clap::ArgAction::Set, help = "Update dependencies or not.")]
     pub update: bool,
+
+    #[arg(
+        long,
+        help = "Path to a config.toml to use to override options during vendor."
+    )]
+    pub import_cargo_config: Option<PathBuf>,
+
     #[arg(
         long,
         help = "Where to output vendor.tar* and cargo_config if method is vendor and registry.tar* if method is registry. If using with `osc service`, this option is automatically appended."
@@ -348,7 +355,7 @@ impl Opts {
         };
 
         let custom_root = if let Some(custom_root) = &self.custom_root {
-            info!(?custom_root, "ℹ️ Custom root is set.");
+            info!(?custom_root, "ℹ️  Custom root is set.");
             setup_workdir.join(custom_root)
         } else {
             setup_workdir.to_path_buf()
@@ -360,6 +367,19 @@ impl Opts {
                 "⚠️ Global update flag was set to false because specific crates to update are set!"
             );
             self.update = false;
+        }
+
+        // If a config.toml exists, and we want to use it, import it now.
+        if let Some(cargo_config) = self.import_cargo_config.as_ref() {
+            let cargo_config_dir = custom_root.join(".cargo");
+            let cargo_config_path = cargo_config_dir.join("config.toml");
+            std::fs::create_dir(cargo_config_dir)?;
+            std::fs::copy(cargo_config, &cargo_config_path).inspect_err(|_| {
+                error!(
+                    "Unable to import cargo config from {}",
+                    cargo_config.display()
+                );
+            })?;
         }
 
         if setup_workdir.exists() && setup_workdir.is_dir() {
@@ -398,7 +418,6 @@ osc service -vvv mr cargo_vendor
             return Err(io::Error::other(msg));
         }
         info!("🌟 OBS Service Cargo finished.");
-        info!("🧹 Cleaning up temporary directories...");
         tempdir_for_workdir.close()?;
         Ok(())
     }

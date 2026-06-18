@@ -37,7 +37,7 @@ fn cargo_command(
 }
 
 pub fn cargo_fetch(curdir: &Path, manifest: &str, respect_lockfile: bool) -> io::Result<String> {
-    info!("⤵️ Running `cargo fetch`...");
+    info!("🚅 Running `cargo fetch`...");
     let mut default_options: Vec<String> = vec![];
     let manifest_path = PathBuf::from(&manifest).canonicalize()?;
     if !manifest_path.is_file() {
@@ -146,7 +146,7 @@ pub fn cargo_vendor(
         let lockfile_bytes = fs::read(&possible_lockfile)?;
         hash.update(&lockfile_bytes);
         let output_hash = hash.finalize();
-        info!(?output_hash, "🔒 Lockfile hash before: ");
+        debug!(?output_hash, "🔒 Lockfile hash before: ");
     }
 
     let is_manifest_workspace = is_workspace(&first_manifest)?;
@@ -205,7 +205,7 @@ pub fn cargo_vendor(
             default_options.push("--locked".to_string());
         }
 
-        info!(?possible_lockfile, "🔓 Adding lockfile.");
+        debug!(?possible_lockfile, "🔓 Adding lockfile.");
         lockfiles.push(possible_lockfile.as_path().to_path_buf());
     } else {
         warn!(
@@ -242,22 +242,22 @@ pub fn cargo_vendor(
         respect_lockfile,
     )?;
 
-    info!("🚝 Attempting to fetch dependencies.");
     cargo_fetch(
         &first_manifest_parent,
         &first_manifest.to_string_lossy(),
         respect_lockfile,
     )?;
-    info!("💼 Fetched dependencies.");
+
     info!("🏪 Running `cargo {}`...", &which_subcommand);
     let res = cargo_command(which_subcommand, &default_options, first_manifest_parent);
+    info!("💼 Vendor complete.");
 
     if possible_lockfile.is_file() {
         let lockfile_bytes = fs::read(&possible_lockfile)?;
         hash.update(&lockfile_bytes);
         let output_hash = hash.finalize();
-        info!(?output_hash, "🔒 Lockfile hash after: ");
-        info!(?possible_lockfile, "🔓 Adding lockfile.");
+        debug!(?output_hash, "🔒 Lockfile hash after: ");
+        debug!(?possible_lockfile, "🔓 Adding lockfile.");
         lockfiles.push(possible_lockfile.as_path().to_path_buf());
     }
 
@@ -273,11 +273,11 @@ pub fn cargo_vendor(
     match res {
         Ok(output_cargo_configuration) => {
             if !global_has_deps {
-                info!(
+                debug!(
                     "🎉 No dependencies! Still, we need to regenerate the lockfile to ensure cargo works."
                 );
             }
-            info!("🏪 `cargo {}` finished.", &which_subcommand);
+            debug!("🏪 `cargo {}` finished.", &which_subcommand);
             Ok(Some((
                 possible_lockfile
                     .canonicalize()
