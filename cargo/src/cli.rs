@@ -372,8 +372,16 @@ impl Opts {
         // If a config.toml exists, and we want to use it, import it now.
         if let Some(cargo_config) = self.import_cargo_config.as_ref() {
             let cargo_config_dir = custom_root.join(".cargo");
+            if !cargo_config_dir.exists() {
+                std::fs::create_dir(&cargo_config_dir).inspect_err(|_| {
+                    error!(
+                        "Unable to create .cargo directory {}",
+                        cargo_config_dir.display()
+                    );
+                })?;
+            }
+
             let cargo_config_path = cargo_config_dir.join("config.toml");
-            std::fs::create_dir(cargo_config_dir)?;
             std::fs::copy(cargo_config, &cargo_config_path).inspect_err(|_| {
                 error!(
                     "Unable to import cargo config from {}",
