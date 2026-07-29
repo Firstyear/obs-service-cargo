@@ -4,7 +4,7 @@ default-members = ["cargo"]
 resolver = "2"
 
 [workspace.package]
-version = "7.2.1"
+version = "7.2.2"
 description = "OBS Source Service and utilities for Rust software packaging."
 authors = [
         "Soc Virnyl Estela <socvirnyl.estela@uncomfyhalomacro.pl>",
@@ -27,6 +27,7 @@ quick-xml = "0.37"
 # Pin to the most recent version before or after 1.0.172
 # https://github.com/serde-rs/serde/issues/2538 is a security risk.
 serde = "1.0"
+toml = { version = "1.1.4", features = ["preserve_order"] }
 
 [workspace.metadata.services]
 assets = ["./cargo_vendor.service"]
