@@ -147,7 +147,7 @@ pub struct Opts {
 
     #[arg(
         long,
-        help = "Path to a config.toml to use to override options during vendor."
+        help = "Path to a config.toml to used to override options during vendor."
     )]
     pub import_cargo_config: Option<PathBuf>,
 

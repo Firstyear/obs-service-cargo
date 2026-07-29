@@ -91,6 +91,7 @@ pub fn cargo_vendor(
     update: bool,
     crates: &[String],
     respect_lockfile: bool,
+    vendor_dirname: &str,
 ) -> io::Result<Option<(PathBuf, String, bool)>> {
     let which_subcommand = if filter { "vendor-filterer" } else { "vendor" };
     let mut default_options: Vec<String> = vec![];
@@ -103,11 +104,11 @@ pub fn cargo_vendor(
 
     if !first_manifest.is_file() {
         let msg = format!(
-            "⚠️ There seems to be no manifest at this path `{}`.",
+            "⚠️  There seems to be no manifest at this path `{}`.",
             first_manifest.display()
         );
         warn!(msg, ?first_manifest);
-        warn!("⚠️ Root manifest does not exist. Will attempt to fallback to manifest paths.");
+        warn!("⚠️  Root manifest does not exist. Will attempt to fallback to manifest paths.");
         if let Some(first) = manifest_paths.first() {
             let fallback_manifest = custom_root.join(first);
             info!(?fallback_manifest, "🐥 Fallback root manifest found.");
@@ -126,10 +127,13 @@ pub fn cargo_vendor(
         };
     }
 
+    info!("Using manifest {} for vendoring", first_manifest.display());
+
     let first_manifest_parent = first_manifest
         .parent()
         .unwrap_or(custom_root)
         .canonicalize()?;
+
     let possible_lockfile = first_manifest_parent.join("Cargo.lock").canonicalize();
     let possible_lockfile = match possible_lockfile {
         Ok(canonicalized_path_to_lockfile) => canonicalized_path_to_lockfile,
@@ -139,6 +143,16 @@ pub fn cargo_vendor(
             first_manifest_parent.join("Cargo.lock").canonicalize()?
         }
     };
+
+    let possible_vendordir = first_manifest_parent.join(vendor_dirname);
+    if possible_vendordir.exists() {
+        error!("Refusing to proceed - a vendor directory already exists in the source tar.");
+        error!("You MUST specify a unique `tag` to proceed");
+        return Err(io::Error::new(
+            io::ErrorKind::DirectoryNotEmpty,
+            "Refusing to proceed - vendor directory already exists. You must specify a unique tag.",
+        ));
+    }
 
     let mut hash = blake3::Hasher::new();
 
@@ -153,7 +167,7 @@ pub fn cargo_vendor(
     let has_deps = has_dependencies(&first_manifest)?;
 
     if is_manifest_workspace {
-        info!("ℹ️ This manifest is in WORKSPACE configuration.");
+        info!("ℹ️  This manifest is in WORKSPACE configuration.");
         let workspace_has_deps = workspace_has_dependencies(custom_root, &first_manifest)?;
         if !workspace_has_deps {
             warn!(
@@ -229,6 +243,9 @@ pub fn cargo_vendor(
         // It's usually enabled on `cargo build -F` tbh...
         default_options.push("--all-features".to_string());
     }
+
+    // Finally set the vendor path.
+    default_options.push(vendor_dirname.to_string());
 
     if !update {
         warn!("😥 Disabled update of dependencies. You should enable this for security updates.");

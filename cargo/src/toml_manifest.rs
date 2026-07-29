@@ -102,7 +102,7 @@ pub fn workspace_has_dependencies(workdir: &Path, src: &Path) -> io::Result<bool
                                 let possible_manifest_at_path =
                                     member_path_from_glob.join("Cargo.toml");
                                 if possible_manifest_at_path.is_file() {
-                                    info!(?possible_manifest_at_path, "🐈 Found a membered path.");
+                                    debug!(?possible_manifest_at_path, "🐈 Found a membered path.");
                                     let is_workspace = is_workspace(&possible_manifest_at_path)?;
                                     if is_workspace {
                                         global_has_deps = global_has_deps
@@ -124,7 +124,7 @@ pub fn workspace_has_dependencies(workdir: &Path, src: &Path) -> io::Result<bool
                             {
                                 let filename = filename.to_string_lossy();
                                 if filename == *"Cargo.toml" {
-                                    info!(?member_path_from_glob, "🐈 Found a membered path.");
+                                    debug!(?member_path_from_glob, "🐈 Found a membered path.");
                                     let is_workspace = is_workspace(&member_path_from_glob)?;
                                     if is_workspace {
                                         global_has_deps = global_has_deps
