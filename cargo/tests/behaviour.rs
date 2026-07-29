@@ -25,10 +25,10 @@ async fn another_vendor_helper(source: &str, update: bool) -> io::Result<PathBuf
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -71,8 +71,8 @@ async fn another_vendor_helper(source: &str, update: bool) -> io::Result<PathBuf
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
     let vendor_tarball_path = &outdir.join(vendor_tarball);
 
@@ -132,10 +132,10 @@ async fn vendor_source(source: &str, filter: bool) -> io::Result<PathBuf> {
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -178,8 +178,8 @@ async fn vendor_source(source: &str, filter: bool) -> io::Result<PathBuf> {
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
     let vendor_tarball_path = &outdir.join(vendor_tarball);
 
@@ -258,10 +258,10 @@ async fn vendor_registry_test_with_no_root_manifest() -> io::Result<()> {
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -304,8 +304,8 @@ async fn vendor_registry_test_with_no_root_manifest() -> io::Result<()> {
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
 
     let vendor_tarball_path = &outdir.join(vendor_tarball);
@@ -349,10 +349,10 @@ async fn manifest_paths_with_vendor() -> io::Result<()> {
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -391,8 +391,8 @@ async fn manifest_paths_with_vendor() -> io::Result<()> {
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
 
     let vendor_tarball_path = &outdir.join(vendor_tarball);
@@ -429,10 +429,10 @@ async fn custom_root_test_1() -> io::Result<()> {
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -471,8 +471,8 @@ async fn custom_root_test_1() -> io::Result<()> {
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
 
     let vendor_tarball_path = &outdir.join(vendor_tarball);
@@ -509,10 +509,10 @@ async fn custom_root_test_2() -> io::Result<()> {
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -551,8 +551,8 @@ async fn custom_root_test_2() -> io::Result<()> {
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
 
     let vendor_tarball_path = &outdir.join(vendor_tarball);
@@ -591,10 +591,10 @@ async fn custom_root_test_3() -> io::Result<()> {
         .url()
         .path_segments()
         .and_then(|mut segments| segments.next_back())
-        .and_then(|name| if name.is_empty() { None } else { Some(name) })
+        .filter(|&name| !name.is_empty())
         .unwrap_or("balls");
     info!("Source file: {}", &fname);
-    let outfile = format!("/{}/{}", "tmp", &fname);
+    let outfile = format!("/{}/{}", "tmp", fname);
     info!("Downloaded to: '{:?}'", &outfile);
     fs::File::create(&outfile).await.unwrap();
     let outfile = PathBuf::from(&outfile);
@@ -638,8 +638,8 @@ async fn custom_root_test_3() -> io::Result<()> {
     let res = opt.run_vendor();
     assert!(res.is_ok());
     let vendor_tarball = match opt.method {
-        Method::Registry => format!("registry-{}.tar.zst", &random_tag),
-        Method::Vendor => format!("vendor-{}.tar.zst", &random_tag),
+        Method::Registry => format!("registry-{}.tar.zst", random_tag),
+        Method::Vendor => format!("vendor-{}.tar.zst", random_tag),
     };
 
     let vendor_tarball_path = &outdir.join(vendor_tarball);
